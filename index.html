@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Train Schedule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
+    <!-- <script src="main.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+
+    <!-- Moment.js Reference -->
+    <script src="http://momentjs.com/downloads/moment.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+    <style>
+        #todo-item {
+            font-weight: 700;
+            font-size: 2em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div id="formy">
+
+                <div>Train Name:
+                    <br>
+                </div>
+                <input type="text" name="trainname" id="trainname">
+                <br>
+                <br>
+                <div>Destination:
+                    <br>
+                </div>
+                <input type="text" name="destination" id="destination">
+                <br>
+                <br>
+                <div>first Train Time (HH:mm - military time):
+                    <br>
+                </div>
+                <input type="text" name="FTtime" id="FTtime">
+                <br>
+                <br>
+                <div>Frequency:
+                    <br>
+                </div>
+                <input type="text" name="frequency" id="frequency">
+                <br>
+                <br>
+                <button id="pushme">Add</button>
+            </div>
+            <div id="dHeader">
+                <h1>Current Train Schedule</h1>
+            </div>
+            <div id="dTrainInfo"></div>
+
+            <!-- <div id="matrix1"></div>
+            <div id="matrix2"></div>
+            <div id="matrix3"></div> -->
+        </div>
+    </div>
+
+    <script>
+
+        // initialize db connection
+        var config = {
+            apiKey: "AIzaSyAQtac_UMR5O5DxdsSlSKJTOXghT_lyLPI",
+            authDomain: "gualafon-9f430.firebaseapp.com",
+            databaseURL: "https://gualafon-9f430.firebaseio.com",
+            projectId: "gualafon-9f430",
+            storageBucket: "gualafon-9f430.appspot.com",
+            messagingSenderId: "944780830840"
+        };
+        firebase.initializeApp(config);
+
+        var database = firebase.database(); //create db object
+
+
+        // listener for the Add button
+        $("#pushme").on("click", function () {
+
+            // console.log();
+
+            // assign vars the values from the form fields
+            var trainname = $("#trainname").val();
+            var destination = $("#destination").val();
+            var FTtime = $("#FTtime").val();
+            var frequency = $("#frequency").val();
+
+            //debuggers
+            console.log("the train name: " + trainname);
+            console.log("the destination: " + destination);
+            console.log("the first train time: " + FTtime);
+            console.log("the trains frequency: " + frequency);
+
+            // pushes the data into the db
+            database.ref().push({
+                "trainname": trainname,
+                "destination": destination,
+                "firsttraintime": FTtime,
+                "frequency": frequency
+            });
+
+            console.log("inside the button push.");
+        });
+
+
+        // listener for change in database, then prepends and prints out train info
+        database.ref().on("child_added", function (snapshot) {
+
+            var nextarrival;
+            var testClock = moment(snapshot.val().firsttraintime).format("HH:mm");
+            // var testClock2 = moment().add(10,'m');
+            console.log("test clock: " + testClock);
+
+            //////////////////////////////////////
+            // Incompleted but this where I would've done moment.js calculations to then print results below
+            ///////////////////////////////////////
+
+            console.log("got inside the listner.");
+            $("#dTrainInfo").prepend("Train Name: " + snapshot.val().trainname + "<br/>Destination: " + snapshot.val().destination + "<br/>First Train: " + snapshot.val().firsttraintime + "<br/>Frequency" + snapshot.val().frequency + "<br/><br/>_______________<br/><br/>");
+
+        });
+
+    </script>
+
+</body>
+
+</html>
